@@ -15,20 +15,52 @@ public class GroundMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // ボールが円上を転がるようにプラットフォームを傾ける
-        float radius = 0.5f; // 円の半径
-        float speed = 1.0f;  // 回転速度
-        float tiltStrength = 5.0f; // 傾きの強さ
+        float tiltSpeed = 15f; // Degrees per second
+        float maxTiltAngle = 10f;
 
-        // 円上の目標点を計算
-        float targetX = Mathf.Cos(Time.time * speed) * radius;
-        float targetZ = Mathf.Sin(Time.time * speed) * radius;
+        Vector3 currentRotation = transform.rotation.eulerAngles;
+        float currentXAngle = currentRotation.x;
+        if (currentXAngle > 180) currentXAngle -= 360;
 
-        // ボールが目標点に向かうように傾ける
-        float tiltX = -targetZ * tiltStrength; // Z座標の反対方向にX軸を傾ける
-        float tiltZ = targetX * tiltStrength;  // X座標と同じ方向にZ軸を傾ける
+        float currentZAngle = currentRotation.z;
+        if (currentZAngle > 180) currentZAngle -= 360;
 
-        // 傾きを適用
-        transform.rotation = Quaternion.Euler(tiltX, 0, tiltZ);
+        // WASDキーで傾ける
+        if (Input.GetKey(KeyCode.W))
+        {
+            float newXAngle = currentXAngle + tiltSpeed * Time.deltaTime;
+            if (newXAngle > maxTiltAngle)
+                newXAngle = maxTiltAngle;
+
+            transform.rotation = Quaternion.Euler(newXAngle, currentRotation.y, currentRotation.z);
+        }
+
+        if (Input.GetKey(KeyCode.S))
+        {
+            float newXAngle = currentXAngle - tiltSpeed * Time.deltaTime;
+            if (newXAngle < -maxTiltAngle)
+                newXAngle = -maxTiltAngle;
+
+            transform.rotation = Quaternion.Euler(newXAngle, currentRotation.y, currentRotation.z);
+        }
+
+        if (Input.GetKey(KeyCode.A))
+        {
+            float newZAngle = currentZAngle + tiltSpeed * Time.deltaTime;
+            if (newZAngle > maxTiltAngle)
+                newZAngle = maxTiltAngle;
+
+
+            transform.rotation = Quaternion.Euler(currentRotation.x, currentRotation.y, newZAngle);
+        }
+
+        if (Input.GetKey(KeyCode.D))
+        {
+            float newZAngle = currentZAngle - tiltSpeed * Time.deltaTime;
+            if (newZAngle < -maxTiltAngle)
+                newZAngle = -maxTiltAngle;
+
+            transform.rotation = Quaternion.Euler(currentRotation.x, currentRotation.y, newZAngle);
+        }
     }
 }
